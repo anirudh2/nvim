@@ -1,15 +1,18 @@
 require "utils"
 
--- TODO: Check working
+function load_command(tab)
+    local loader = {"BufNewFile,BufReadPre,FileReadPre"}
+    local loader = table_concat(loader, tab)
 
-local new_file = "BufNewFile,BufReadPre,FileReadPre"
+    return loader
+end
 
 local filetypes ={
     textFile = {
-        {"BufNewFile,BufReadPre,FileReadPre", "*.txt", "set ft=text"}
+        load_command({"*.txt", "set ft=text"})
     };
     luaFile = {
-        {"BufNewFile,BufReadPre,FileReadPre", "*.lua", "set ft=lua"}
+        load_command({"*.lua", "set ft=lua"})
     };
     --latex = {
         --{"BufNewFile,BufReadPre,FileReadPre", "*.tex,*.bib", "set ft=latex"}

@@ -4,6 +4,7 @@
 vim.wo.number = true
 vim.wo.relativenumber = true
 
-vim.api.nvim_command("highlight Search ctermbg=134")
+vim.api.nvim_command("highlight ColorColumn ctermbg=17")
 
--- Colouring
+-- Default colour columns
+vim.api.nvim_command("let &colorcolumn=\"80,\".join(range(80,999), \",\")")

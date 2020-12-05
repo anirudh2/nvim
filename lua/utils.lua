@@ -1,4 +1,5 @@
--- Taken from https://github.com/norcalli/nvim_utils/blob/master/lua/nvim_utils.lua#L554-L567
+-- Taken from
+-- https://github.com/norcalli/nvim_utils/blob/master/lua/nvim_utils.lua#L554-L567
 function nvim_create_augroups(definitions)
     for group_name, definition in pairs(definitions) do
         vim.api.nvim_command("augroup "..group_name)
@@ -9,4 +10,12 @@ function nvim_create_augroups(definitions)
         end
         vim.api.nvim_command("augroup END")
     end
+end
+
+-- Table helpers
+function table_concat(tab1, tab2)
+    for i,v in ipairs(tab2) do
+	table.insert(tab1, v)
+    end
+    return tab1
 end
