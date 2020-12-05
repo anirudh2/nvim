@@ -1,10 +1,10 @@
 -- Defines the plugins that neovim uses. Plugins managed by packer
 -- https://github.com/wbthomason/packer.nvim
 
---return require("packer").startup(function()
-    -- Packer manages itself
-    --use {"wbthomason/packer.nvim", opt = true }
+-- Include Packer from opt path
+vim.cmd [[packadd packer.nvim]]
 
-    -- wal colourscheme
-    --use {"dylanaraps/wal.vim", opt = true }
---end)
+return require("packer").startup(function()
+    -- Packer manages itself
+    use {"wbthomason/packer.nvim", opt = true }
+end)
