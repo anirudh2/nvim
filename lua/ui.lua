@@ -5,3 +5,5 @@ vim.wo.number = true
 vim.wo.relativenumber = true
 
 vim.api.nvim_command("highlight Search ctermbg=134")
+
+-- Colouring
