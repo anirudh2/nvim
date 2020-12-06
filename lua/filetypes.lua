@@ -14,9 +14,12 @@ local filetypes ={
     luaFile = {
         load_command({"*.lua", "set ft=lua"})
     };
-    --latex = {
-        --{"BufNewFile,BufReadPre,FileReadPre", "*.tex,*.bib", "set ft=latex"}
-    --};
+    latex = {
+        load_command({"*.tex,*.bib,", "set ft=latex"})
+    };
+    markdown = {
+        load_command({"*.md", "set ft=markdown"})
+    };
 }
 
 nvim_create_augroups(filetypes)

@@ -13,4 +13,7 @@ return require("packer").startup(function()
     -- Tags
     use { "ludovicchabant/vim-gutentags" }
     use { "preservim/tagbar" }
+
+    -- Text-style documents
+    use { "reedes/vim-wordy", ft = {"latex", "text", "markdown"}}
 end)
