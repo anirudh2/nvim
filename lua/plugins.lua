@@ -7,13 +7,13 @@
 vim.cmd [[packadd packer.nvim]]
 
 return require("packer").startup(function()
-    -- Packer manages itself
-    use {"wbthomason/packer.nvim", opt = true }
+  -- Packer manages itself
+  use {"wbthomason/packer.nvim", opt = true }
 
-    -- Tags
-    use { "ludovicchabant/vim-gutentags" }
-    use { "preservim/tagbar" }
+  -- Tags
+  use { "ludovicchabant/vim-gutentags" }
+  use { "preservim/tagbar" }
 
-    -- Text-style documents
-    use { "reedes/vim-wordy", ft = {"latex", "text", "markdown"}}
+  -- Text-style documents
+  use { "reedes/vim-wordy", ft = {"latex", "text", "markdown"}}
 end)
