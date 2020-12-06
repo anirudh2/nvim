@@ -1,0 +1,19 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/anirudh/.config/nvim/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20201206.0/
+<leader>c	ftplugin/lua.vim	/^vnoremap <silent> <leader>c :s\/^\/--\/<cr>:noh<cr>$/;"	m
+<leader>u	ftplugin/lua.vim	/^vnoremap <silent> <leader>u :s\/^--\/\/<cr>:noh<cr>$/;"	m
+load_command	lua/filetypes.lua	/^function load_command(tab)$/;"	f
+nvim	README.md	/^# nvim$/;"	c
+nvim_create_augroups	lua/utils.lua	/^function nvim_create_augroups(definitions)$/;"	f
+packer_load_aucmds	plugin/packer_compiled.vim	/^augroup packer_load_aucmds$/;"	a
+s:load	plugin/packer_compiled.vim	/^function! s:load(names, cause) abort$/;"	f
+table_concat	lua/utils.lua	/^function table_concat(tab1, tab2)$/;"	f

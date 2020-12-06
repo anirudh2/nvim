@@ -14,6 +14,12 @@ end
 
 -- Table helpers
 function table_concat(tab1, tab2)
+    -- Concatenates tab2 to the end of tab2
+
+    assert(type(tab1) == "table", "Table concat takes as arguments tables, but"
+            .. " the tab1 provided is not a table.")
+    assert(type(tab2) == "table", "Table concat takes as arguments tables, but"
+            .. " the tab2 provided is not a table.")
     for i,v in ipairs(tab2) do
 	table.insert(tab1, v)
     end
