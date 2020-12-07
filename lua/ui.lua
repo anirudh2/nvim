@@ -14,3 +14,6 @@ vim.api.nvim_command( "set termguicolors" )
 vim.api.nvim_command( "let g:airline_powerline_fonts = 1" )
 vim.api.nvim_command( "let g:Powerline_symbols='fancy'" )
 vim.api.nvim_command( "let g:airline_theme='onedark'" )
+
+-- Completion
+vim.api.nvim_command( "set completeopt=menuone,noinsert,noselect" )

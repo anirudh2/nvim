@@ -39,4 +39,11 @@ return require("packer").startup(function()
   -- NERDTree
   use { "preservim/nerdtree" }
   use { "Xuyuanp/nerdtree-git-plugin" }
+
+  -- Autocomplete
+  use {
+    "nvim-lua/completion-nvim",
+    { "neovim/nvim-lspconfig", config = function() require "lsp_local".configure_lsp() end },
+  }
+  use { "nvim-treesitter/completion-treesitter" }
 end)
