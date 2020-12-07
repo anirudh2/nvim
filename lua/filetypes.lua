@@ -21,20 +21,20 @@ function load_command(tab)
 end
 
 -- Create new filetypes
-local filetypes ={
+local filetypes = {
   textFile = {
       load_command({"*.txt", "set ft=text"})
   };
   luaFile = {
-      load_command({"*.lua", "set ft=lua"})
+      load_command({"*.lua", "set ft=lua"});
   };
-  latex = {
+  latexFile = {
       load_command({"*.tex,*.bib,", "set ft=latex"})
   };
-  markdown = {
+  markdownFile = {
       load_command({"*.md", "set ft=markdown"})
   };
 }
 
 -- Filetype autocommand groups
-nvim_create_augroups(filetypes)
+nvim_augroups(filetypes)

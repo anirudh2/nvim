@@ -5,6 +5,7 @@
 
 -- Include Packer from opt path
 vim.cmd [[packadd packer.nvim]]
+vim.cmd [[packadd nvim-treesitter]]
 
 return require("packer").startup(function()
   -- Packer manages itself
@@ -16,4 +17,7 @@ return require("packer").startup(function()
 
   -- Text-style documents
   use { "reedes/vim-wordy", ft = {"latex", "text", "markdown"}}
+
+  -- Treesitter
+  use { "nvim-treesitter/nvim-treesitter", event = "VimEnter *", config=function() require "treesitter" end }
 end)

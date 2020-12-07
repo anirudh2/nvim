@@ -1,6 +1,21 @@
+function nvim_autocommand(def)
+  --[[
+    Applies an autocommand
+
+    def (Table[str]): The content of the autocommand split into separate
+      strings.
+      
+      Example:
+        {"BufNewFile", "*.lua", "set ft=lua"}
+  --]]
+  local command = table.concat(vim.tbl_flatten("autocmd", def), " ")
+  vim.api.nvim_command(command)
+end
+
+
 -- Modified from
 -- https://github.com/norcalli/nvim_utils/blob/master/lua/nvim_utils.lua#L554-L567
-function nvim_create_augroups(definitions)
+function nvim_augroups(definitions)
   --[[
     Creates autocommand groups
 
@@ -31,8 +46,7 @@ function nvim_create_augroups(definitions)
     vim.api.nvim_command("autocmd!")
     for _, def in ipairs(definition) do
       -- Unwrap table into string split by " "
-      local command = table.concat(vim.tbl_flatten("autocmd", def), " ")
-      vim.api.nvim_command(command)
+      nvim_autocommand(def)
     end
     vim.api.nvim_command("augroup END")
   end
@@ -53,9 +67,11 @@ local valid_modes = {
   [" "] = "";
 }
 
-function nvim_apply_mappings(mappings, default_options)
+
+function nvim_mappings(mappings, default_options)
   -- Create mappings
 end
+
 
 -- Table helpers
 function table_concat(tab1, tab2)
