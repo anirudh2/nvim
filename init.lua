@@ -1,6 +1,6 @@
-require "ui"
-require "filetypes"
 require "plugins"
+require "filetypes"
+require "ui"
 
 -- Mapping
 vim.api.nvim_set_keymap("i", "jj", "<Esc>", { noremap = true })

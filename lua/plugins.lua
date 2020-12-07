@@ -22,6 +22,7 @@ return require("packer").startup(function()
   use { "nvim-treesitter/nvim-treesitter", event = "VimEnter *",
     config = function() require "treesitter" end }
 
-  -- Colorizer (optional)
-  use { "norcalli/nvim-colorizer.lua" }
+  -- Color schemes
+  use { "norcalli/nvim-colorizer.lua" }  -- Colorizer to visual hex colours in terminal
+  use { "christianchiarulli/nvcode-color-schemes.vim" }
 end)
