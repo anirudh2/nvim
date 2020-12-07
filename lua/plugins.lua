@@ -44,6 +44,10 @@ return require("packer").startup(function()
   use {
     "nvim-lua/completion-nvim",
     { "neovim/nvim-lspconfig", config = function() require "lsp_local".configure_lsp() end },
+    ft = { "python", "lua", "bash", "vimscript" }
   }
   use { "nvim-treesitter/completion-treesitter" }
+
+  use { "tpope/vim-commentary" }
+
 end)
