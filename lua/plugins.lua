@@ -29,4 +29,7 @@ return require("packer").startup(function()
   -- Airline
   use { "vim-airline/vim-airline" }
   use { "vim-airline/vim-airline-themes" }
+
+  -- Git
+  use { "tpope/vim-fugitive" }
 end)
