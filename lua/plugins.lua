@@ -25,4 +25,8 @@ return require("packer").startup(function()
   -- Color schemes
   use { "norcalli/nvim-colorizer.lua" }  -- Colorizer to visual hex colours in terminal
   use { "christianchiarulli/nvcode-color-schemes.vim" }
+
+  -- Airline
+  use { "vim-airline/vim-airline" }
+  use { "vim-airline/vim-airline-themes" }
 end)
