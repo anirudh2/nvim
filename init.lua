@@ -13,3 +13,6 @@ vim.api.nvim_buf_set_option(0, "autoindent", true)
 
 -- Leader
 vim.g.mapleader = ";"
+
+-- Colorizer
+require "colorizer".setup()

@@ -16,8 +16,12 @@ return require("packer").startup(function()
   use { "preservim/tagbar" }
 
   -- Text-style documents
-  use { "reedes/vim-wordy", ft = {"latex", "text", "markdown"}}
+  use { "reedes/vim-wordy", ft = { "latex", "text", "markdown" }}
 
   -- Treesitter
-  use { "nvim-treesitter/nvim-treesitter", event = "VimEnter *", config=function() require "treesitter" end }
+  use { "nvim-treesitter/nvim-treesitter", event = "VimEnter *",
+    config = function() require "treesitter" end }
+
+  -- Colorizer (optional)
+  use { "norcalli/nvim-colorizer.lua" }
 end)

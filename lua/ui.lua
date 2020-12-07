@@ -4,4 +4,4 @@
 vim.wo.number = true
 vim.wo.relativenumber = true
 
-vim.api.nvim_command("highlight ColorColumn ctermbg=244")
+vim.api.nvim_command("set termguicolors")
