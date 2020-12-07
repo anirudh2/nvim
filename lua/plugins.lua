@@ -32,4 +32,11 @@ return require("packer").startup(function()
 
   -- Git
   use { "tpope/vim-fugitive" }
+
+  -- Icons
+  use { "ryanoasis/vim-devicons" }
+
+  -- NERDTree
+  use { "preservim/nerdtree" }
+  use { "Xuyuanp/nerdtree-git-plugin" }
 end)
