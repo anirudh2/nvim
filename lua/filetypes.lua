@@ -1,4 +1,5 @@
 require "utils"
+require "latex"
 
 function load_command(tab)
   --[[
@@ -28,13 +29,12 @@ local filetypes = {
   luaFile = {
       load_command({"*.lua", "set ft=lua"});
   };
-  latexFile = {
-      load_command({"*.tex,*.bib,", "set ft=latex"})
-  };
   markdownFile = {
       load_command({"*.md", "set ft=markdown"})
   };
 }
+
+-- vim.api.nvim_command( "filetype plugin on" )
 
 -- Filetype autocommand groups
 nvim_augroups(filetypes)

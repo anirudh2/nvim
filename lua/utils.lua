@@ -4,7 +4,7 @@ function nvim_autocommand(def)
 
     def (Table[str]): The content of the autocommand split into separate
       strings.
-      
+
       Example:
         {"BufNewFile", "*.lua", "set ft=lua"}
   --]]

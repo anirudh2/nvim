@@ -13,6 +13,7 @@ function M.configure_lsp()
     "pyls",
     "vimls",
     "bashls",
+    "texlab",
   }
 
   for _, lsp_server in ipairs(servers) do
