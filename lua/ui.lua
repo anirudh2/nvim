@@ -17,3 +17,11 @@ vim.api.nvim_command( "let g:airline_theme='onedark'" )
 
 -- Completion
 vim.api.nvim_command( "set completeopt=menuone,noinsert,noselect" )
+
+-- Tabs
+vim.api.nvim_buf_set_option(0, "expandtab", true)
+vim.api.nvim_buf_set_option(0, "shiftwidth", 4)
+vim.api.nvim_buf_set_option(0, "autoindent", true)
+
+-- Colorizer
+require "colorizer".setup()
