@@ -68,8 +68,47 @@ local valid_modes = {
 }
 
 
+-- Modified from
+-- https://github.com/norcalli/nvim_utils/blob/master/lua/nvim_utils.lua
 function nvim_mappings(mappings, default_options)
-  -- Create mappings
+  --[[
+    Applies the mappings
+
+    Arguments:
+      mappings (Table): A table containing a list of mappings.
+      default_options (Table): The default options for mappings
+  --]]
+  local current_bufnr = vim.api.nvim_get_current_buf()
+
+  for key, options in pairs(mappings) do
+    options = vim.tbl_extend("keep", options, default_options or {})
+
+    -- Protect against bufnr == 0 as it denotes current buffer
+    local bufnr = current_bufnr
+    if type(options.buffer) == "number" and options.buffer ~= 0 then
+      bufnr = options.bufnr
+    end
+
+    -- Get the first letter of the key and ensure that it's an allows nvim mode
+    local mode, mapping = key:match("^(.)(.+)$")
+    if not mode then
+      assert(false, "nvim_mappings: invalid mode for keymapping "..key)
+    end
+    if not valid_modes[mode] then
+      assert(false, "nvim_mappings: invalid mode for keymapping. mode="..mode)
+    end
+    mode = valid_modes[mode]
+
+    -- Set the keymap
+    local rhs = options[1]
+    options[1] = nil
+    if options.buffer then
+      options.buffer = nil
+      vim.api.nvim_buf_set_keymap(bufnr, mode, mapping, rhs, options)
+    else
+      vim.api.nvim_set_keymap(mode, mapping, rhs, options)
+    end
+  end
 end
 
 
