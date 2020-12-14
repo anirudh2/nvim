@@ -1,0 +1,12 @@
+# https://github.com/honza/vim-snippets/blob/master/UltiSnips/snippets.snippets#L5
+snippet snip "Ultisnips snippet definition" b
+`!p snip.rv = "snippet"` ${1:Trigger} "${2:Description}" ${3}
+	${0:${VISUAL}}
+`!p snip.rv = "endsnippet"`
+endsnippet
+
+snippet pg "Ultisnips Python global definition" b
+`!p snip.rv = "global !p"`
+${0:${VISUAL}}
+`!p snip.rv = "endglobal"`
+endsnippet

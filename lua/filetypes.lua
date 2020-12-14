@@ -32,6 +32,9 @@ local filetypes = {
   markdownFile = {
       load_command({"*.md", "set ft=markdown"})
   };
+  snippetsFile = {
+      load_command({"*.snippets", "set ft=snippets"})
+  };
 }
 
 -- vim.api.nvim_command( "filetype plugin on" )

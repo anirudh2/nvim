@@ -1,0 +1,104 @@
+global !p
+def classname(cname: str):
+	"""
+	Gets the name of the class without the prefix
+
+	Arguments:
+		cname (str): The name of the class with the prefix
+
+	Returns:
+		c_type (str): The name of the class without the prefix.
+	"""
+	import re
+
+	pattern = "([A-Z][a-z]*)(.*)"  # Group 1 is first capitalised word
+	match = re.match(pattern, cname)
+	
+	c_type = "Invalid Class Name"
+	if match:
+		c_type = match.group(2)
+		if c_type.endswith("s"):
+			c_type += "es"
+		else:
+			c_type += "s"
+
+	return c_type
+
+def split_args(fn_args, num_tabs):
+	"""
+	Splits the arguments and formats them for google docstrings
+
+	Arguments:
+		fn_args (str): A string giving the arguments of a function or
+			method.
+		num_tabs (int): The number of tabs to properly construct the
+			docstring.
+	"""
+	if fn_args == "":
+		return ""
+
+	import regex
+
+	# Split at , as long as , not in []	
+	r = regex.compile(r'(\[(?:[^\[\]]++|\g<1>)*\])(*SKIP)(*FAIL)|\s*,\s*')
+	new_s = r.split(fn_args)
+
+	# Get rid of NoneTypes
+	split_str = list(filter(lambda x: x!=None, new_s))
+
+	# Convert to Google Docstrings format
+	google_str = []
+	for ss in split_str:
+		ss_list = ss.split(": ")
+		if len(ss_list) == 2:
+			google_str.append(f"{ss_list[0]} ({ss_list[1]}): <++>")
+		else:
+			google_str.append(f"{ss_list[0]}: <++>")
+
+	# Can't use \t because snippets have a different tab length
+	tab_spaces = 4
+	tab_spacing = " " * num_tabs * tab_spaces
+	new_str = f"\n{tab_spacing}".join(google_str)
+
+	return new_str
+endglobal
+
+
+snippet abc "Creates an Abstract Base Class" b
+"""
+Implements ${1:AbstractClassName}
+"""
+
+from abc import ABC
+
+class $1(ABC):
+	"""
+	The interface class for `!p snip.rv=classname(cname=t[1])`
+
+	Attributes:
+		<++>
+	"""
+	def __init__(self, ${2:Arguments}):
+		"""
+		The init method of the $1 class.
+
+		Arguments:
+			`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+		"""
+		super().__init__()
+		${3:Code}
+endsnippet
+
+snippet md "Creates a new method"
+def ${1:method_name}(self, ${2:Arguments}) -> ${3:ReturnType}:
+	"""
+	${4:Description}
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
+	"""
+	${5:Code}
+endsnippet

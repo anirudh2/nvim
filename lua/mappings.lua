@@ -31,3 +31,7 @@ local mappings = {
 }
 
 nvim_mappings(mappings, { silent = true; })
+
+-- vim.api.nvim_command( "let g:UltiSnipsExpandTrigger='<Space>'" )
+-- vim.api.nvim_command( "let g:UltiSnipsJumpForwardTrigger='\\<c-j>'" )
+-- vim.api.nvim_command( "let g:UltiSnipsJumpBackwardTrigger='\\<c-k>'" )

@@ -54,4 +54,7 @@ return require("packer").startup(function()
   -- Commenting
   use { "tpope/vim-commentary" }
 
+  -- Snippets
+  use { "SirVer/ultisnips" }
+
 end)
