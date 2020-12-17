@@ -1,4 +1,46 @@
 global !p
+def base_class(snip):
+	"""
+	Creates a base class by using the name of the file to find
+		the corresponding interface class and copying it.
+	"""
+	import re
+
+	module_name = snip.basename
+
+	# Remove _base
+	interface_name = "i" + "_".join(module_name.split("_")[:-1]) + ".py"
+
+	# Read interface file
+	content = []
+	with open(interface_name) as fin:
+		# content = fin.read()
+		for line in fin:
+			if re.search("abstract", line):
+				continue
+			if re.search("(ABC)", line):
+				pattern = "^class (I[A-za-z]*)"
+				match = re.match(pattern, line)
+				iclass = match.group(1)
+			content.append(line)
+
+	# Join list of strings to str
+	content = "".join(content)
+
+	# Create ClassNameBase
+	pattern = "([A-z][a-z]*)(.*)"
+	base_name = "Base" + re.match(pattern, iclass).group(2)
+
+	# Replace IClassName with BaseClassName
+	content = re.sub(iclass, base_name, content)
+	# Replace "ABC" with iclass
+	content = re.sub("ABC", iclass, content)
+	# Replace "interface" with "base"
+	content = re.sub("interface", "base", content)
+
+	# Set return value
+	snip.rv = content
+
 def classname(cname: str):
 	"""
 	Gets the name of the class without the prefix
@@ -17,8 +59,12 @@ def classname(cname: str):
 	c_type = "Invalid Class Name"
 	if match:
 		c_type = match.group(2)
+
 		if c_type.endswith("s"):
 			c_type += "es"
+		if c_type.endswith("y"):
+			c_type = c_type[:-1]
+			c_type += "ies"
 		else:
 			c_type += "s"
 
@@ -103,4 +149,117 @@ def ${1:method_name}(self, ${2:Arguments}) -> ${3:ReturnType}:
 		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
 	"""
 	${5:Code}
+endsnippet
+
+snippet amd "Creates an abstract method" 
+@abstractmethod
+def ${1:method_name}(self, ${2:Arguments}) -> ${3:ReturnType}:
+	"""
+	${4:Description}
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
+	"""
+	pass
+endsnippet
+
+snippet smd "Creates a static method" 
+@staticmethod
+def ${1:method_name}(${2:Arguments}) -> ${3:ReturnType}:
+	"""
+	${4:Description}
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
+	"""
+	${5:Code}
+endsnippet
+
+snippet cmd "Creates a class method" 
+@classmethod
+def ${1:method_name}(cls, ${2:Arguments}) -> ${3:ReturnType}:
+	"""
+	${4:Description}
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
+	"""
+	${5:Code}
+endsnippet
+
+snippet prop "Creates a property" 
+@property
+def ${1:PropertyName}(self) -> ${2:ReturnType}:
+	"""
+	${3:Description}
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+	"""
+	${4:Code}
+
+@$1.setter
+def $1(self, ${5:Arguments}):
+	"""
+	$3
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[5], num_tabs=3)`
+	"""
+	${6:Code}
+endsnippet
+
+snippet aprop "Creates an abstract property" 
+@property
+@abstractmethod
+def ${1:PropertyName}(self) -> ${2:ReturnType}:
+	"""
+	${3:Description}
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+	"""
+	pass
+
+@$1.setter
+@abstractmethod
+def $1(self, ${5:Arguments}):
+	"""
+	$3
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[5], num_tabs=3)`
+	"""
+	pass
+endsnippet
+
+snippet fn "Create a function" 
+def ${1:FunctionName}(${2:Arguments}) -> ${3:ReturnType}:
+	"""
+	${4:Description}
+
+	Arguments:
+		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
+
+	Returns:
+		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
+	"""
+	${5:Code}
+endsnippet
+
+snippet base "Creates a Base class" 
+`!p base_class(snip)`
+endsnippet
+
+snippet todo "Insert a TODO" 
+# TODO: ${1:Description} `echo $USER` `!v strftime("%c")`
 endsnippet

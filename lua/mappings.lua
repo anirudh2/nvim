@@ -14,13 +14,16 @@ local mappings = {
   -- Remove Highlighting
   ["n<leader>nh"] = { ":noh<CR>" };  -- Leader nh -> remove highlighting
 
-  -- Navigating autocomplete
-  ["i<Space>"] = { 'pumvisible() ? "\\<c-y>" : "\\<Space>"', expr=true; noremap=false; silent=false };  -- Space -> Enter
+  -- Autocomplete
+  -- ["i<Space>"] = { 'pumvisible() ? "\\<c-y>" : "\\<Space>"', expr=true; noremap=false; silent=false };  -- Space -> Enter
   ["i<S-Tab>"] = { 'pumvisible() ? "\\<c-p>" : "\\<S-Tab>"', expr=true; noremap=false; silent=false };  -- Shift-tab -> Up
   ["i<Tab>"] = { 'pumvisible() ? "\\<c-n>" : "\\<Tab>"', expr=true; noremap=false; silent=false };  -- Tab -> Down
+  ["n<F2>"] = { ":CompletionToggle<CR>" };  -- Toggle Autocomplete
+  ["i<F2>"] = { "<Esc>:CompletionToggle<CR>a" };  -- Toggle Autocomplete
 
   -- Tagbar
   ["n<leader>tb"] = { ":TagbarToggle<CR>" };  -- Leader tb -> TagbarToggle
+  ["i<leader>tb"] = { "<Esc>:TagbarToggle<CR>a" };  -- Leader tb -> TagbarToggle
 
   -- Wordy
   ["n<leader>nw"] = { ":NextWordy<CR>" };  -- Leader nw -> NextWordy
@@ -28,10 +31,10 @@ local mappings = {
 
   -- NERDTree
   ["n<leader>nt"] = { ":NERDTreeToggle<CR>" };  -- Leader nt -> Toggle NERDTree
+  ["i<leader>nt"] = { "<Esc>:NERDTreeToggle<CR>a" };  -- Leader nt -> Toggle NERDTree
+
+  -- Remove whitespace
+  ["n<leader>w"] = { ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>" }
 }
 
 nvim_mappings(mappings, { silent = true; })
-
--- vim.api.nvim_command( "let g:UltiSnipsExpandTrigger='<Space>'" )
--- vim.api.nvim_command( "let g:UltiSnipsJumpForwardTrigger='\\<c-j>'" )
--- vim.api.nvim_command( "let g:UltiSnipsJumpBackwardTrigger='\\<c-k>'" )

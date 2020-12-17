@@ -37,7 +37,5 @@ local filetypes = {
   };
 }
 
--- vim.api.nvim_command( "filetype plugin on" )
-
 -- Filetype autocommand groups
 nvim_augroups(filetypes)
