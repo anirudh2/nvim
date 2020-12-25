@@ -3,48 +3,75 @@ global !p
 import vim
 import regex
 
-def parse_args(args):
+def parse_args(args, dtc, atc):
 	"""
 	Parses the args into a google docstring format
 
 	Arguments:
 		args (str): The arguments of a function or method
+		dtc (str): The tab character for the description
+		atc (str): The tab character for the args.
 
 	Returns:
 		args (str): The arguments of a function of method in
 			a google docstring format.
+
+	Notes:
+		Modified from https://stackoverflow.com/a/26809037
 	"""
-	# Don't continue if 
+	# Don't continue if no arguments
 	if args == "":
 		return args
 
-	google_str = ["\n\tArguments:"]
-	r = regex.compile(r'(\[(?:[^\[\]]++|\g<1>)*\])(*SKIP)(*FAIL)|\s*,\s*')
-	args_split = r.split(args)
-
-	# Get rid of NoneTypes
-	args_split = list(filter(lambda x: x!=None, args_split))
-
-	for ss in args_split:
-		ss_list = ss.split(": ")
-		if len(ss_list) == 2:
-			google_str.append(
-				f"{ss_list[0]} ({ss_list[1]}): <++>"
-			)
+	# Split at , outside of []
+	google_str = []
+	bracket_level = 0
+	curr = []
+	for c in (args + ","):
+		if c == "," and bracket_level == 0:
+			google_str.append("".join(curr))
+			curr = []
+		elif c == " " and bracket_level == 0:
+			continue
 		else:
-			google_str.append(f"{ss_list[0]}: <++>")
-		args = "\n\t\t".join(google_str)
+			if c == "[":
+				bracket_level += 1
+			elif c == "]":
+				bracket_level -= 1
+			curr.append(c)
+
+	# Split at : when possible
+	google_str = [s.split(":") for s in google_str]
+
+	# Create the new args string
+	args = f"\n{dtc}Arguments:"
+	for s in google_str:
+		# If splitting at : was succesful, insert the type
+		if len(s) == 2:
+			args += f"\n{atc + s[0]} ({s[1]}): <++>"
+		# If splitting at : was not succesful, no type
+		else:
+			args += f"\n{atc + s[0]}: <++>"
 
 	return args
 
-def create_function():
+def create_function(min_tabs, is_method=True, start_str=""):
 	"""
 	Generates a docstring for the given function or method.
+
+	Arguments:
+		min_tabs (int): The number of tabs for the function definition
+		is_method (bool): Whether to create a method. Defaults to True
+		start_str (str): A string that starts the function definition. Defaults to ""
 	"""
 	if snip.tabstop == 0:  # Once all the fields have been filled.
 		# Setup
 		args_map = {"Arguments": ""}
 		return_map = {"": ":", "Return Type": ":"}
+		tab_char = "\t"
+		fn_tab_char = tab_char * min_tabs
+		desc_tab_char = tab_char * (min_tabs + 1)
+		args_tab_char = tab_char * (min_tabs + 2)
 
 		# Get tabstop text
 		name = snip.tabstops[1].current_text
@@ -63,29 +90,36 @@ def create_function():
 		for i in range(last, first - 1, -1):
 			del snip.buffer[i]
 
-		# Define the function
-		func_def = f"def {name}({args})" + return_type + "\n\t"
-		docstring = f"\"\"\"\n\t{description}\n\t"
+		snip.buffer.append("")
+
+		docstring = f"\"\"\"\n{desc_tab_char + description}\n"
 
 		# Parse the args into a google-style docstring
-		docstring += parse_args(args)
+		docstring += parse_args(args, desc_tab_char, args_tab_char)
 
 		# Parse the return type into a google-style docstring
 		if not return_type == "":
-			r = regex.compile(f'( ?-> )(.*(?=:))')
-			return_type = r.split(return_type)[-2]
-			return_type = "\n\n\tReturns:\n\t\t" + return_type + ":"
+			r = regex.compile(f'( -> )(.*(?=:))')
+			r_type = r.split(return_type)[-2]
+			r_type = f"\n\n{desc_tab_char}Returns:\n{args_tab_char}" + r_type + ":"
 
-		docstring += return_type
+		docstring += r_type
 
 		# Close docstring
-		docstring += "\n\t\"\"\"\n\t"
+		docstring += f"\n{desc_tab_char}\"\"\"\n{desc_tab_char}"
+
+		if is_method:
+			args = "self, " + args
+		if start_str != "":
+			start_str = fn_tab_char + start_str + "\n"
+		# Define the function
+		func_def = f"{start_str}{fn_tab_char}def {name}({args})" + return_type + f"\n{desc_tab_char}"
 
 		snip.expand_anon(func_def + docstring)
 endglobal
 
 
-post_jump "create_function()"
+post_jump "create_function(min_tabs=0, is_method=False)"
 snippet fn "function declaration"
 # Define your function here.
 # ${1:Function Name}
@@ -94,3 +128,38 @@ snippet fn "function declaration"
 # ${4:Description}
 endsnippet
 
+post_jump "create_function(min_tabs=1)"
+snippet md "method declaration"
+# Define your method here.
+# ${1:Function Name}
+# ${2:Arguments}
+# ${3:Return Type}
+# ${4:Description}
+endsnippet
+
+post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod")"
+snippet smd "staticmethod declaration"
+# Define your method here.
+# ${1:Function Name}
+# ${2:Arguments}
+# ${3:Return Type}
+# ${4:Description}
+endsnippet
+
+post_jump "create_function(min_tabs=1, is_method=False, start_str="@abstractmethod")"
+snippet amd "abstractmethod declaration"
+# Define your method here.
+# ${1:Function Name}
+# ${2:Arguments}
+# ${3:Return Type}
+# ${4:Description}
+endsnippet
+
+post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod\n\t@abstractmethod")"
+snippet asmd "abstract staticmethod declaration"
+# Define your method here.
+# ${1:Function Name}
+# ${2:Arguments}
+# ${3:Return Type}
+# ${4:Description}
+endsnippet
