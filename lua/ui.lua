@@ -16,8 +16,8 @@ vim.api.nvim_command( "let g:Powerline_symbols='fancy'" )
 vim.api.nvim_command( "let g:airline_theme='onedark'" )
 
 -- Completion
--- vim.api.nvim_command( "set completeopt=menuone,noinsert,noselect" )
-vim.api.nvim_command( "set completeopt=menuone,noinsert" )
+vim.api.nvim_command( "set completeopt=menuone,noinsert,noselect" )
+-- vim.api.nvim_command( "set completeopt=menuone,noinsert" )
 
 -- Tabs
 vim.api.nvim_buf_set_option(0, "expandtab", true)

@@ -1,265 +1,96 @@
 global !p
-def base_class(snip):
+
+import vim
+import regex
+
+def parse_args(args):
 	"""
-	Creates a base class by using the name of the file to find
-		the corresponding interface class and copying it.
-	"""
-	import re
-
-	module_name = snip.basename
-
-	# Remove _base
-	interface_name = "i" + "_".join(module_name.split("_")[:-1]) + ".py"
-
-	# Read interface file
-	content = []
-	with open(interface_name) as fin:
-		# content = fin.read()
-		for line in fin:
-			if re.search("abstract", line):
-				continue
-			if re.search("(ABC)", line):
-				pattern = "^class (I[A-za-z]*)"
-				match = re.match(pattern, line)
-				iclass = match.group(1)
-			content.append(line)
-
-	# Join list of strings to str
-	content = "".join(content)
-
-	# Create ClassNameBase
-	pattern = "([A-z][a-z]*)(.*)"
-	base_name = "Base" + re.match(pattern, iclass).group(2)
-
-	# Replace IClassName with BaseClassName
-	content = re.sub(iclass, base_name, content)
-	# Replace "ABC" with iclass
-	content = re.sub("ABC", iclass, content)
-	# Replace "interface" with "base"
-	content = re.sub("interface", "base", content)
-
-	# Set return value
-	snip.rv = content
-
-def classname(cname: str):
-	"""
-	Gets the name of the class without the prefix
+	Parses the args into a google docstring format
 
 	Arguments:
-		cname (str): The name of the class with the prefix
+		args (str): The arguments of a function or method
 
 	Returns:
-		c_type (str): The name of the class without the prefix.
+		args (str): The arguments of a function of method in
+			a google docstring format.
 	"""
-	import re
+	# Don't continue if 
+	if args == "":
+		return args
 
-	pattern = "([A-Z][a-z]*)(.*)"  # Group 1 is first capitalised word
-	match = re.match(pattern, cname)
-	
-	c_type = "Invalid Class Name"
-	if match:
-		c_type = match.group(2)
-
-		if c_type.endswith("s"):
-			c_type += "es"
-		if c_type.endswith("y"):
-			c_type = c_type[:-1]
-			c_type += "ies"
-		else:
-			c_type += "s"
-
-	return c_type
-
-def split_args(fn_args, num_tabs):
-	"""
-	Splits the arguments and formats them for google docstrings
-
-	Arguments:
-		fn_args (str): A string giving the arguments of a function or
-			method.
-		num_tabs (int): The number of tabs to properly construct the
-			docstring.
-	"""
-	if fn_args == "":
-		return ""
-
-	import regex
-
-	# Split at , as long as , not in []	
+	google_str = ["\n\tArguments:"]
 	r = regex.compile(r'(\[(?:[^\[\]]++|\g<1>)*\])(*SKIP)(*FAIL)|\s*,\s*')
-	new_s = r.split(fn_args)
+	args_split = r.split(args)
 
 	# Get rid of NoneTypes
-	split_str = list(filter(lambda x: x!=None, new_s))
+	args_split = list(filter(lambda x: x!=None, args_split))
 
-	# Convert to Google Docstrings format
-	google_str = []
-	for ss in split_str:
+	for ss in args_split:
 		ss_list = ss.split(": ")
 		if len(ss_list) == 2:
-			google_str.append(f"{ss_list[0]} ({ss_list[1]}): <++>")
+			google_str.append(
+				f"{ss_list[0]} ({ss_list[1]}): <++>"
+			)
 		else:
 			google_str.append(f"{ss_list[0]}: <++>")
+		args = "\n\t\t".join(google_str)
 
-	# Can't use \t because snippets have a different tab length
-	tab_spaces = 4
-	tab_spacing = " " * num_tabs * tab_spaces
-	new_str = f"\n{tab_spacing}".join(google_str)
+	return args
 
-	return new_str
+def create_function():
+	"""
+	Generates a docstring for the given function or method.
+	"""
+	if snip.tabstop == 0:  # Once all the fields have been filled.
+		# Setup
+		args_map = {"Arguments": ""}
+		return_map = {"": ":", "Return Type": ":"}
+
+		# Get tabstop text
+		name = snip.tabstops[1].current_text
+		args = args_map.get(snip.tabstops[2].current_text,
+			f"{snip.tabstops[2].current_text}")
+		return_type = return_map.get(snip.tabstops[3].current_text,
+			f" -> {snip.tabstops[3].current_text}:")
+		description = snip.tabstops[4].current_text
+
+		# Get snippet lines
+		line_ix = 0
+		first = snip.snippet_start[line_ix]
+		last = snip.snippet_end[line_ix]
+
+		# Subtract one since range end is off-by-one
+		for i in range(last, first - 1, -1):
+			del snip.buffer[i]
+
+		# Define the function
+		func_def = f"def {name}({args})" + return_type + "\n\t"
+		docstring = f"\"\"\"\n\t{description}\n\t"
+
+		# Parse the args into a google-style docstring
+		docstring += parse_args(args)
+
+		# Parse the return type into a google-style docstring
+		if not return_type == "":
+			r = regex.compile(f'( ?-> )(.*(?=:))')
+			return_type = r.split(return_type)[-2]
+			return_type = "\n\n\tReturns:\n\t\t" + return_type + ":"
+
+		docstring += return_type
+
+		# Close docstring
+		docstring += "\n\t\"\"\"\n\t"
+
+		snip.expand_anon(func_def + docstring)
 endglobal
 
 
-snippet abc "Creates an Abstract Base Class" b
-"""
-Implements ${1:AbstractClassName}
-"""
-
-from abc import ABC
-
-
-class $1(ABC):
-	"""
-	The interface class for `!p snip.rv=classname(cname=t[1])`
-
-	Attributes:
-		<++>
-	"""
-
-	def __init__(self, ${2:Arguments}):
-		"""
-		The init method of the $1 class.
-
-		Arguments:
-			`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-		"""
-		super().__init__()
-		${3:Code}
+post_jump "create_function()"
+snippet fn "function declaration"
+# Define your function here.
+# ${1:Function Name}
+# ${2:Arguments}
+# ${3:Return Type}
+# ${4:Description}
 endsnippet
 
-snippet md "Creates a new method"
-def ${1:method_name}(self, ${2:Arguments}) -> ${3:ReturnType}:
-	"""
-	${4:Description}
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
-	"""
-	${5:Code}
-endsnippet
-
-snippet amd "Creates an abstract method" 
-@abstractmethod
-def ${1:method_name}(self, ${2:Arguments}) -> ${3:ReturnType}:
-	"""
-	${4:Description}
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
-	"""
-	pass
-endsnippet
-
-snippet smd "Creates a static method" 
-@staticmethod
-def ${1:method_name}(${2:Arguments}) -> ${3:ReturnType}:
-	"""
-	${4:Description}
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
-	"""
-	${5:Code}
-endsnippet
-
-snippet cmd "Creates a class method" 
-@classmethod
-def ${1:method_name}(cls, ${2:Arguments}) -> ${3:ReturnType}:
-	"""
-	${4:Description}
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
-	"""
-	${5:Code}
-endsnippet
-
-snippet prop "Creates a property" 
-@property
-def ${1:PropertyName}(self) -> ${2:ReturnType}:
-	"""
-	${3:Description}
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-	"""
-	${4:Code}
-
-@$1.setter
-def $1(self, ${5:Arguments}):
-	"""
-	$3
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[5], num_tabs=3)`
-	"""
-	${6:Code}
-endsnippet
-
-snippet aprop "Creates an abstract property" 
-@property
-@abstractmethod
-def ${1:PropertyName}(self) -> ${2:ReturnType}:
-	"""
-	${3:Description}
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-	"""
-	pass
-
-@$1.setter
-@abstractmethod
-def $1(self, ${5:Arguments}):
-	"""
-	$3
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[5], num_tabs=3)`
-	"""
-	pass
-endsnippet
-
-snippet fn "Create a function" 
-def ${1:FunctionName}(${2:Arguments}) -> ${3:ReturnType}:
-	"""
-	${4:Description}
-
-	Arguments:
-		`!p snip.rv=split_args(fn_args=t[2], num_tabs=3)`
-
-	Returns:
-		`!p snip.rv=split_args(fn_args=t[3], num_tabs=3)`
-	"""
-	${5:Code}
-endsnippet
-
-snippet base "Creates a Base class" 
-`!p base_class(snip)`
-endsnippet
-
-snippet todo "Insert a TODO" 
-# TODO: ${1:Description} `echo $USER` `!v strftime("%c")`
-endsnippet
