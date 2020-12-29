@@ -3,7 +3,78 @@ global !p
 import vim
 import regex
 
-def parse_args(args, dtc, atc):
+
+def create_property():
+	"""
+	Creates a property
+	"""
+	if snip.tabstop == 0:
+		name, return_type, description = _prop_tabstops(snip)
+		rv = _create_function(1, name, "", return_type, description, is_method=True, start_str="@property\n\t@abstractmethod")
+		r_type = _parse_return(return_type)
+		args = f"val: {r_type}"
+		rv += _create_function(1, name, args, "", description, start_str=f"\n\t@{name}.setter\n\t@abstractmethod")
+
+		_delete(snip)
+		snip.expand_anon(rv)
+
+
+def create_function(min_tabs, is_method=True, start_str=""):
+	"""
+	Generates a docstring for the given function or method.
+
+	Arguments:
+		min_tabs (int): The number of tabs for the function definition
+		is_method (bool): Whether to create a method. Defaults to True
+		start_str (str): A string that starts the function definition. Defaults to ""
+	"""
+	if snip.tabstop == 0:  # Once all the fields have been filled.
+		name, args, return_type, description = _fn_tabstops(snip)
+		out_str = _create_function(min_tabs, name, args, return_type, description, is_method, start_str)
+		_delete(snip)
+		snip.expand_anon(out_str)
+
+
+def _prop_tabstops(snip):
+	"""
+	Gets the tabstop values for a property
+	"""
+	general_map = {"": "<++>"}
+	return_map = {"": ":", "Return Type": ":"}
+
+	# Get tabstop text
+	name = general_map.get(snip.tabstops[1].current_text,
+		f"{snip.tabstops[1].current_text}")
+	return_type = return_map.get(snip.tabstops[2].current_text,
+		f" -> {snip.tabstops[2].current_text}:")
+	description = general_map.get(snip.tabstops[3].current_text,
+		f"{snip.tabstops[3].current_text}")
+
+	return name, return_type, description
+
+
+def _fn_tabstops(snip):
+	"""
+	Gets the tabstop values for a function
+	"""
+	general_map = {"": "<++>"}
+	args_map = {"Arguments": ""}
+	return_map = {"": ":", "Return Type": ":"}
+
+	# Get tabstop text
+	name = general_map.get(snip.tabstops[1].current_text,
+		f"{snip.tabstops[1].current_text}")
+	args = args_map.get(snip.tabstops[2].current_text,
+		f"{snip.tabstops[2].current_text}")
+	return_type = return_map.get(snip.tabstops[3].current_text,
+		f" -> {snip.tabstops[3].current_text}:")
+	description = general_map.get(snip.tabstops[4].current_text,
+		f"{snip.tabstops[4].current_text}")
+
+	return name, args, return_type, description
+
+
+def _parse_args(args, dtc, atc):
 	"""
 	Parses the args into a google docstring format
 
@@ -55,67 +126,85 @@ def parse_args(args, dtc, atc):
 
 	return args
 
-def create_function(min_tabs, is_method=True, start_str=""):
+
+def _delete(snip):
+	"""
+	Deletes the snippet contents
+	"""
+	# Get snippet lines
+	line_ix = 0
+	first = snip.snippet_start[line_ix]
+	last = snip.snippet_end[line_ix]
+
+	# Subtract one since range end is off-by-one
+	for i in range(last, first - 1, -1):
+		del snip.buffer[i]
+
+
+def _parse_return(return_type):
+	"""
+	Parses the return type.
+
+	Arguments:
+		return_type (str): The string representing the return type with func_def formatting.
+
+	Returns:
+		r_type (str): The return type with docstring formatting.
+	"""
+	r_type = ""
+	if not return_type == "":
+		r = regex.compile(f'( -> )(.*(?=:))')
+		r_type = r.split(return_type)[-2]
+
+	return r_type
+
+
+def _create_function(min_tabs, name, args, return_type, description, is_method=True, start_str=""):
 	"""
 	Generates a docstring for the given function or method.
 
 	Arguments:
 		min_tabs (int): The number of tabs for the function definition
+		name (str): The name of the function
+		args (str): The args of the function
+		return_type (str): The return type of the function
+		description (str): The description of function
 		is_method (bool): Whether to create a method. Defaults to True
 		start_str (str): A string that starts the function definition. Defaults to ""
 	"""
-	if snip.tabstop == 0:  # Once all the fields have been filled.
-		# Setup
-		args_map = {"Arguments": ""}
-		return_map = {"": ":", "Return Type": ":"}
-		tab_char = "\t"
-		fn_tab_char = tab_char * min_tabs
-		desc_tab_char = tab_char * (min_tabs + 1)
-		args_tab_char = tab_char * (min_tabs + 2)
+	# Setup
+	tab_char = "\t"
+	fn_tab_char = tab_char * min_tabs
+	desc_tab_char = tab_char * (min_tabs + 1)
+	args_tab_char = tab_char * (min_tabs + 2)
+	docstring = f"\"\"\"\n{desc_tab_char + description}\n"
 
-		# Get tabstop text
-		name = snip.tabstops[1].current_text
-		args = args_map.get(snip.tabstops[2].current_text,
-			f"{snip.tabstops[2].current_text}")
-		return_type = return_map.get(snip.tabstops[3].current_text,
-			f" -> {snip.tabstops[3].current_text}:")
-		description = snip.tabstops[4].current_text
+	# Parse the args into a google-style docstring
+	docstring += _parse_args(args, desc_tab_char, args_tab_char)
 
-		# Get snippet lines
-		line_ix = 0
-		first = snip.snippet_start[line_ix]
-		last = snip.snippet_end[line_ix]
+	# Parse the return type into a google-style docstring
+	r_type = _parse_return(return_type)
+	if r_type == "":
+		return_type = ":"
+	else:
+		r_type = f"\n\n{desc_tab_char}Returns:\n{args_tab_char}" + r_type + ":"
+	docstring += r_type
 
-		# Subtract one since range end is off-by-one
-		for i in range(last, first - 1, -1):
-			del snip.buffer[i]
+	# Close docstring
+	docstring += f"\n{desc_tab_char}\"\"\"\n{desc_tab_char}"
 
-		snip.buffer.append("")
-
-		docstring = f"\"\"\"\n{desc_tab_char + description}\n"
-
-		# Parse the args into a google-style docstring
-		docstring += parse_args(args, desc_tab_char, args_tab_char)
-
-		# Parse the return type into a google-style docstring
-		if not return_type == "":
-			r = regex.compile(f'( -> )(.*(?=:))')
-			r_type = r.split(return_type)[-2]
-			r_type = f"\n\n{desc_tab_char}Returns:\n{args_tab_char}" + r_type + ":"
-
-		docstring += r_type
-
-		# Close docstring
-		docstring += f"\n{desc_tab_char}\"\"\"\n{desc_tab_char}"
-
-		if is_method:
+	if is_method:
+		if args == "":
+			args = "self"
+		else:
 			args = "self, " + args
-		if start_str != "":
-			start_str = fn_tab_char + start_str + "\n"
-		# Define the function
-		func_def = f"{start_str}{fn_tab_char}def {name}({args})" + return_type + f"\n{desc_tab_char}"
+	if start_str != "":
+		start_str = fn_tab_char + start_str + "\n"
+	# Define the function
+	func_def = f"{start_str}{fn_tab_char}def {name}({args})" + return_type + f"\n{desc_tab_char}"
 
-		snip.expand_anon(func_def + docstring)
+	out_str = func_def + docstring
+	return out_str
 endglobal
 
 
@@ -131,7 +220,7 @@ endsnippet
 post_jump "create_function(min_tabs=1)"
 snippet md "method declaration"
 # Define your method here.
-# ${1:Function Name}
+# ${1:Method Name}
 # ${2:Arguments}
 # ${3:Return Type}
 # ${4:Description}
@@ -139,8 +228,8 @@ endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod")"
 snippet smd "staticmethod declaration"
-# Define your method here.
-# ${1:Function Name}
+# Define your staticmethod here.
+# ${1:Method Name}
 # ${2:Arguments}
 # ${3:Return Type}
 # ${4:Description}
@@ -148,8 +237,8 @@ endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@abstractmethod")"
 snippet amd "abstractmethod declaration"
-# Define your method here.
-# ${1:Function Name}
+# Define your abstractmethod here.
+# ${1:Method Name}
 # ${2:Arguments}
 # ${3:Return Type}
 # ${4:Description}
@@ -157,9 +246,17 @@ endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod\n\t@abstractmethod")"
 snippet asmd "abstract staticmethod declaration"
-# Define your method here.
-# ${1:Function Name}
+# Define your abstract staticmethod here.
+# ${1:Method Name}
 # ${2:Arguments}
 # ${3:Return Type}
 # ${4:Description}
+endsnippet
+
+post_jump "create_property()"
+snippet aprop "abstract property declaration"
+# Define your abstract property here.
+# ${1:Property Name}
+# ${2:Return Type}
+# ${3:Description}
 endsnippet
