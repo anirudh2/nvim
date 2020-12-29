@@ -3,6 +3,27 @@ global !p
 import vim
 import regex
 
+def create_class(c_type):
+	"""
+	Creates a class
+
+	Arguments:
+		c_type (str): The type of class to create. Can be "abc", "base", or "concrete"
+	"""
+	if snip.tabstop == 0:
+		# Setup
+		class_map = {"abc": _create_abc, "base": _create_base}
+
+		# Get the rv
+		class_constructor = class_map[c_type]
+		rv = class_constructor(snip)
+
+		# Delete current snippet contents
+		_delete(snip)
+
+		# Write in the return value
+		snip.expand_anon(rv)
+
 
 def create_property(abstract, getter):
 	"""
@@ -54,6 +75,22 @@ def create_function(min_tabs, is_method=True, start_str=""):
 		out_str = _create_function(min_tabs, name, args, return_type, description, is_method, start_str)
 		_delete(snip)
 		snip.expand_anon(out_str)
+
+
+def _abc_tabstops(snip):
+	"""
+	Gets the tabstop values for an ABC
+	"""
+	general_map = {"": "<++>"}
+	args_map = {"Arguments": ""}
+
+	# Get tabstop text
+	name = general_map.get(snip.tabstops[1].current_text,
+		f"{snip.tabstops[1].current_text}")
+	args = args_map.get(snip.tabstops[2].current_text,
+		f"{snip.tabstops[2].current_text}")
+
+	return name, args
 
 
 def _prop_tabstops(snip):
@@ -228,11 +265,57 @@ def _create_function(min_tabs, name, args, return_type, description, is_method=T
 
 	out_str = func_def + docstring
 	return out_str
+
+
+def _create_abc(snip):
+	"""
+	Creates an ABC from the tabstops
+
+	Returns:
+		rv (str): The text of the ABC
+	"""
+	name, args = _abc_tabstops(snip)
+	c_type = _classname(name)	
+
+	rv = (f"\"\"\"\nImplements {name}\n\"\"\""
+		+ f"\n\nfrom abc import ABC, abstractmethod\n\n\n"
+		+ f"class {name}(ABC):\n"
+		+ f"\t\"\"\"\n\tThe abstract class for {c_type}.\n\t\"\"\"\n\n")
+	rv += _create_function(min_tabs=1, name="__init__", args=args, return_type="", description=f"The init method for {name}", is_method=True)
+
+	return rv
+
+def _classname(cname):
+	"""
+	Gets the name of the class without the prefix
+
+	Arguments:
+		cname (str): The name of the class with the prefix
+
+	Returns:
+		c_type (str): The name of the class without the prefix.
+	"""
+	pattern = "([A-Z][a-z]*)(.*)"  # Group 1 is first capitalised word
+	match = re.match(pattern, cname)
+
+	c_type = "Invalid Class Name"
+	if match:
+		c_type = match.group(2)
+
+		if c_type.endswith("s"):
+			c_type += "es"
+		if c_type.endswith("y"):
+			c_type = c_type[:-1]
+			c_type += "ies"
+		else:
+			c_type += "s"
+
+	return c_type
 endglobal
 
 
 post_jump "create_function(min_tabs=0, is_method=False)"
-snippet fn "function declaration"
+snippet fn "function definition"
 # Define your function here.
 # ${1:Function Name}
 # ${2:Arguments}
@@ -241,7 +324,7 @@ snippet fn "function declaration"
 endsnippet
 
 post_jump "create_function(min_tabs=1)"
-snippet md "method declaration"
+snippet md "method definition"
 # Define your method here.
 # ${1:Method Name}
 # ${2:Arguments}
@@ -250,7 +333,7 @@ snippet md "method declaration"
 endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod")"
-snippet smd "staticmethod declaration"
+snippet smd "staticmethod definition"
 # Define your staticmethod here.
 # ${1:Method Name}
 # ${2:Arguments}
@@ -259,7 +342,7 @@ snippet smd "staticmethod declaration"
 endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@abstractmethod")"
-snippet amd "abstractmethod declaration"
+snippet amd "abstractmethod definition"
 # Define your abstractmethod here.
 # ${1:Method Name}
 # ${2:Arguments}
@@ -268,7 +351,7 @@ snippet amd "abstractmethod declaration"
 endsnippet
 
 post_jump "create_function(min_tabs=1, is_method=False, start_str="@staticmethod\n\t@abstractmethod")"
-snippet asmd "abstract staticmethod declaration"
+snippet asmd "abstract staticmethod definition"
 # Define your abstract staticmethod here.
 # ${1:Method Name}
 # ${2:Arguments}
@@ -277,7 +360,7 @@ snippet asmd "abstract staticmethod declaration"
 endsnippet
 
 post_jump "create_property(abstract=True, getter=False)"
-snippet aprop "abstract property declaration"
+snippet aprop "abstract property definition"
 # Define your abstract property here.
 # ${1:Property Name}
 # ${2:Return Type}
@@ -285,7 +368,7 @@ snippet aprop "abstract property declaration"
 endsnippet
 
 post_jump "create_property(abstract=False, getter=False)"
-snippet prop "property declaration"
+snippet prop "property definition"
 # Define your property here.
 # ${1:Property Name}
 # ${2:Return Type}
@@ -293,7 +376,7 @@ snippet prop "property declaration"
 endsnippet
 
 post_jump "create_property(abstract=True, getter=True)"
-snippet agprop "abstract property (getter only) declaration"
+snippet agprop "abstract property (getter only) definition"
 # Define your abstract getter property here.
 # ${1:Property Name}
 # ${2:Return Type}
@@ -301,9 +384,16 @@ snippet agprop "abstract property (getter only) declaration"
 endsnippet
 
 post_jump "create_property(abstract=False, getter=True)"
-snippet gprop "property (getter only) declaration"
+snippet gprop "property (getter only) definition"
 # Define your getter property here.
 # ${1:Property Name}
 # ${2:Return Type}
 # ${3:Description}
+endsnippet
+
+post_jump "create_class(c_type="abc")"
+snippet abc "Abstract Base Class definition"
+# Define your ABC here
+# ${1:Class Name}
+# ${2:Arguments}
 endsnippet
