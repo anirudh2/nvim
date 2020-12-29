@@ -4,18 +4,39 @@ import vim
 import regex
 
 
-def create_property():
+def create_property(abstract, getter):
 	"""
 	Creates a property
+
+	Arguments:
+		abstract (bool): Whether the property is abstract
+		getter (bool): Whether the property is only a getter
 	"""
 	if snip.tabstop == 0:
-		name, return_type, description = _prop_tabstops(snip)
-		rv = _create_function(1, name, "", return_type, description, is_method=True, start_str="@property\n\t@abstractmethod")
-		r_type = _parse_return(return_type)
-		args = f"val: {r_type}"
-		rv += _create_function(1, name, args, "", description, start_str=f"\n\t@{name}.setter\n\t@abstractmethod")
+		# Setup
+		abstract_str = "\n\t@abstractmethod" if abstract else ""
 
+		# Parse tabstops
+		name, return_type, description = _prop_tabstops(snip)
+
+		# Create the getter
+		rv = _create_function(1, name, "", return_type, description, is_method=True, start_str=f"@property{abstract_str}")
+
+		if not getter:
+			# Marker to jump back to getter
+			rv += "<++>\n\t"
+
+			# Return of getter is the type of the setter
+			r_type = _parse_return(return_type)
+			args = f"val: {r_type}"
+
+			# Create the setter
+			rv += _create_function(1, name, args, "", description, start_str=f"\n\t@{name}.setter{abstract_str}")
+
+		# Delete the current contents of the snippet
 		_delete(snip)
+
+		# Write in the property text
 		snip.expand_anon(rv)
 
 
@@ -124,6 +145,8 @@ def _parse_args(args, dtc, atc):
 		else:
 			args += f"\n{atc + s[0]}: <++>"
 
+	args += "\n"
+
 	return args
 
 
@@ -187,7 +210,7 @@ def _create_function(min_tabs, name, args, return_type, description, is_method=T
 	if r_type == "":
 		return_type = ":"
 	else:
-		r_type = f"\n\n{desc_tab_char}Returns:\n{args_tab_char}" + r_type + ":"
+		r_type = f"\n{desc_tab_char}Returns:\n{args_tab_char}" + r_type + ": <++>"
 	docstring += r_type
 
 	# Close docstring
@@ -253,9 +276,33 @@ snippet asmd "abstract staticmethod declaration"
 # ${4:Description}
 endsnippet
 
-post_jump "create_property()"
+post_jump "create_property(abstract=True, getter=False)"
 snippet aprop "abstract property declaration"
 # Define your abstract property here.
+# ${1:Property Name}
+# ${2:Return Type}
+# ${3:Description}
+endsnippet
+
+post_jump "create_property(abstract=False, getter=False)"
+snippet prop "property declaration"
+# Define your property here.
+# ${1:Property Name}
+# ${2:Return Type}
+# ${3:Description}
+endsnippet
+
+post_jump "create_property(abstract=True, getter=True)"
+snippet agprop "abstract property (getter only) declaration"
+# Define your abstract getter property here.
+# ${1:Property Name}
+# ${2:Return Type}
+# ${3:Description}
+endsnippet
+
+post_jump "create_property(abstract=False, getter=True)"
+snippet gprop "property (getter only) declaration"
+# Define your getter property here.
 # ${1:Property Name}
 # ${2:Return Type}
 # ${3:Description}
