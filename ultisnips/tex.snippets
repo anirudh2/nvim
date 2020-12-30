@@ -1,0 +1,79 @@
+snippet hovey "chovey's LaTeX template" 
+%%!TEX TS-program = latex
+
+% ## [local] $ la  // pdflatex -shell-escape main.tex ## without temp dir
+% [local] $ la  // pdflatex -shell-escape --output-dir=temp main.tex
+
+% --------------
+% DOCUMENT CLASS
+% --------------
+% \documentclass[10pt,twoside,letterpaper,fleqn]{report}
+%%%%%
+%%%%% ----------------- black on white -> white on black %%%%%
+% Option 1 of 2: article
+%\documentclass[11pt,letterpaper,fleqn]{report}
+% Option 2 of 2: slides
+\documentclass[14pt,letterpaper,fleqn]{extreport}
+\usepackage{geometry}
+\geometry{landscape}
+\usepackage{pagecolor}
+\definecolor{hred}{rgb}{1,0,0}
+\definecolor{hivory}{rgb}{1,1,0.94}
+\definecolor{hdarkblueblack}{RGB}{30,30,40}
+\definecolor{hdarkgrayblack}{RGB}{35,35,35}
+%\definecolor{hdarkgrayblack}{RGB}{30,30,30}
+%\definecolor{hdarkgrayblack}{RGB}{25,25,25}
+\pagecolor{hdarkgrayblack} % toggle on for dark mode
+\color{white} % toggle on for dark mode
+%%%%% ----------------- black on white -> white on black %%%%%
+%%%%%
+% \documentclass[12pt,letterpaper,fleqn]{article}
+%\documentclass[12pt,a4paper,twoside,fleqn]{book}
+% \documentclass[12pt,letterpaper,twoside,fleqn]{book}
+% A4 paper measures 210 × 297 millimeters (8.27 × 11.69 inches).
+\usepackage{enumitem}
+\usepackage{minted}
+\usepackage[outputdir=temp]{minted} % https://tex.stackexchange.com/questions/339931/latex-minted-package-using-custom-output-directory-build
+
+% ----------
+% PAGE SETUP
+% ----------
+\renewcommand{\baselinestretch}{1.2}
+% -----------------
+% HEADER AND FOOTER
+% -----------------
+
+\newcommand{\titlestring}{${1:Title String}}  
+\newcommand{\authorstring}{${2:Anirudh Patel}}
+\newcommand{\yearstring}{${3:2021}}
+\newcommand{\datestring}{\yyyymmdddate\today}
+\title{\titlestring}
+\author{\authorstring}
+
+\date{\today}
+
+\fancyhead{} % clear all header fields
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\rightmark}
+\fancyhead[RE]{\leftmark}
+\fancyfoot{} % clear all footer fields
+\fancyfoot[LE,RO]{\scriptsize \datestring}
+\fancyfoot[LO,RE]{\scriptsize \titlestring \; \copyright \; \authorstring }
+\pagestyle{fancy}
+% ==========================================
+
+% -----------------
+% THE MAIN DOCUMENT
+% -----------------
+\begin{document}
+\title{\titlestring}
+\author{\authorstring\footnote{Corresponding author: ${4:patel.anirudh0025@gmail.com}}
+\\ 
+[2ex] 
+\datestring}
+\maketitle
+
+{\tableofcontents}
+
+\end{document}
+endsnippet
