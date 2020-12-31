@@ -15,9 +15,8 @@ local mappings = {
   ["n<leader>nh"] = { ":noh<CR>" };  -- Leader nh -> remove highlighting
 
   -- Autocomplete
-  -- ["i<Space>"] = { 'pumvisible() ? "\\<c-y>" : "\\<Space>"', expr=true; noremap=false; silent=false };  -- Space -> Enter
-  ["i<S-Tab>"] = { 'pumvisible() ? "\\<c-p>" : "\\<S-Tab>"', expr=true; noremap=false; silent=false };  -- Shift-tab -> Up
-  ["i<Tab>"] = { 'pumvisible() ? "\\<c-n>" : "\\<Tab>"', expr=true; noremap=false; silent=false };  -- Tab -> Down
+  ["i<M-k>"] = { 'pumvisible() ? "\\<c-p>" : "\\<M-k>"', expr=true; noremap=false; silent=false };  -- Alt-k -> Up
+  ["i<M-j>"] = { 'pumvisible() ? "\\<c-n>" : "\\<M-j>"', expr=true; noremap=false; silent=false };  -- Alt-j -> Down
   ["n<F2>"] = { ":CompletionToggle<CR>" };  -- Toggle Autocomplete
   ["i<F2>"] = { "<Esc>:CompletionToggle<CR>a" };  -- Toggle Autocomplete
 
