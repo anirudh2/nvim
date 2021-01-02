@@ -1,8 +1,14 @@
-snippet hovey "chovey's LaTeX template" 
+snippet hovey "chovey's LaTeX template"
 %%!TEX TS-program = latex
 
+% [chama] $ pdflatex main.tex
+
+% [local] $ ~/bin/  // bash scripts
 % ## [local] $ la  // pdflatex -shell-escape main.tex ## without temp dir
 % [local] $ la  // pdflatex -shell-escape --output-dir=temp main.tex
+% [local] $ lae // la then open is TEMP explorer (Windows)
+% [local] $ lax // la then open as main.pdf in explorer (Windows)
+
 
 % --------------
 % DOCUMENT CLASS
@@ -15,6 +21,7 @@ snippet hovey "chovey's LaTeX template"
 % Option 2 of 2: slides
 \documentclass[14pt,letterpaper,fleqn]{extreport}
 \usepackage{geometry}
+\usepackage{xcolor}
 \geometry{landscape}
 \usepackage{pagecolor}
 \definecolor{hred}{rgb}{1,0,0}
@@ -31,20 +38,140 @@ snippet hovey "chovey's LaTeX template"
 %\documentclass[12pt,a4paper,twoside,fleqn]{book}
 % \documentclass[12pt,letterpaper,twoside,fleqn]{book}
 % A4 paper measures 210 × 297 millimeters (8.27 × 11.69 inches).
+%
+% https://www.overleaf.com/learn/latex/text_alignment
+% \usepackage[document]{ragged2e} % better readability
+% but no longer indents or separates on paragraphs, dislike??
+%
+% -------
+% PACKAGE
+% -------
+% http://ctan.mirrors.hoobly.com/macros/latex/contrib/hyperref/doc/manual.pdf
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true, % instead of default boxed links, use color links
+  linkcolor=magenta, % instead of red default, use blue
+  citecolor=magenta, % instead of default green, use blue
+  urlcolor=magenta % instead of magenta default, use blue
+} % close hyperref
+%
+\usepackage{framed} % for Hquote environment
+
+% reduce space between captions and figures/tables
+\usepackage[font=small,skip=0pt]{caption}
+% http://mirrors.ibiblio.org/CTAN/fonts/fontawesome5/doc/fontawesome5.pdf
+\usepackage{fontawesome5} % for \faGithub for example
+
+\usepackage{amsmath} % needed for align of equations
+\usepackage{amssymb}
+\usepackage[toc,titletoc,header]{appendix}
+\usepackage{datetime}  \renewcommand{\dateseparator}{-}
+% \usepackage{epsfig}
+% \usepackage{include/fancyheadings}
+% \usepackage{fancyheadings}
+\usepackage{fancyhdr}
+\usepackage{multirow} 
+\usepackage[percent]{overpic}  % \includegraphics 
+\usepackage{graphicx} % for vertical spacing between subfigures
+%\usepackage[cleanup={.tex,.dvi,.ps,.log},process=all]{pstool}
+%\usepackage{showframe} % bounding boxes on all LaTeX text areas
+%\usepackage{subfigure} % requires \usepackage{epsfig} too
+% \usepackage{cancel}
+% 
+% Lowercase fourth order tensors begin
+\usepackage[utf8]{inputenc}  % Unicode and TeX
+% https://tex.stackexchange.com/questions/384265/how-to-use-mathbbol-only-for-greek-and-lowercase
 \usepackage{enumitem}
+%\usepackage[usenames, dvipsnames]{color}
+%\definecolor{hg}{gray}{0.6} % Hovey gray
+%%%%\usepackage[x11names,table]{xcolor}  % needed by ../book/h_math_ams.tex
+% See color names at https://tex.stackexchange.com/questions/102777/does-anyone-have-a-newrgbcolorcolournamex-x-x-list
+%%%\usepackage[x11names]{xcolor}
+% \usepackage{tcolorbox}
+
 \usepackage{minted}
-\usepackage[outputdir=temp]{minted} % https://tex.stackexchange.com/questions/339931/latex-minted-package-using-custom-output-directory-build
+% \usepackage[outputdir=temp]{minted} % https://tex.stackexchange.com/questions/339931/latex-minted-package-using-custom-output-directory-build
+%i
+% See minted documentation 
+% http://mirrors.rit.edu/CTAN/macros/latex/contrib/minted/minted.pdf0
+% $pdflatex -shell-escape main.tex
+
+% \usepackage{showframe} % show/hide bounding boxes for all margins
+
+% -------
+% INCLUDE
+% -------
+
+% BEGIN float definitions for boxes
+%  \usepackage{float}
+%  \floatstyle{boxed}
+%  % define box float; top bottom here; list of boxes; 
+%  %\newfloat{Box}{tbh}{lob}[chapter]
+%  \newfloat{hboxfloat}{tbh}{lob}
+%  \floatname{hboxfloat}{Box}
+%\restylefloat{table}   % To re-style the 'table' float
+% END float definitions for boxes
+
+% Fix text figures showing as Fig. 3.2.1 (in Section 3.2.1), but 
+% figure caption appears as Fig. 3.1.  Want the text reference to
+% also be Fig 3.1.
+% \renewcommand{\thefigure}{\arabic{figure}}
+
+% ------------
+% ENVIRONMENTS
+% ------------
+
 
 % ----------
 % PAGE SETUP
 % ----------
+% =============================================
+% https://www.sharelatex.com/learn/Page_size_and_margins (page was removed?)
+% https://en.wikibooks.org/wiki/LaTeX/Page_Layout
+% =============================================
+% 0
+% \setlength{\paperwidth}{8.5in}
+% \setlength{\paperheight}{11.0in}
+% 1
+%\setlength{\hoffset}{0.0in}
+%% 2
+%\setlength{\voffset}{0.0in}
+%% 3
+%\setlength{\oddsidemargin}{0.0in}
+%\setlength{\evensidemargin}{0.0in}
+%% 4
+%\setlength{\topmargin}{-0.25in}
+%% 5
+\setlength{\headheight}{16.0pt}
+%% 6
+%\setlength{\headsep}{0.25in}
+%% 7
+%\setlength{\textheight}{8.5in}
+%% 8
+%\setlength{\textwidth}{6.5in}
+%% 9
+%% \setlength{\marginparsep}{10pt}
+%\setlength{\marginparsep}{0pt}
+%% 10 
+%\setlength{\marginparwidth}{0mm}
+%\setlength{\voffset}{0pt}
+%% 11
+%\setlength{\footskip}{10mm}
+
+% Paragraphs
+% \setlength{\parindent}{10mm}
+% \setlength{\parskip}{0mm}
+
+% Space between lines
 \renewcommand{\baselinestretch}{1.2}
+
+
 % -----------------
 % HEADER AND FOOTER
 % -----------------
 
-\newcommand{\titlestring}{${1:Title String}}  
-\newcommand{\authorstring}{${2:Anirudh Patel}}
+\newcommand{\titlestring}{${1:Title}}  
+\newcommand{\authorstring}{${2:Author}}
 \newcommand{\yearstring}{${3:2021}}
 \newcommand{\datestring}{\yyyymmdddate\today}
 \title{\titlestring}
@@ -52,14 +179,38 @@ snippet hovey "chovey's LaTeX template"
 
 \date{\today}
 
+%\pagestyle{empty} % before redefining, empty head and foot
+%\chead{\sc{\small  \titlestring
+%   \hfill \footnotesize \thepage}}
+%\lhead[\small \thesection ]{\small \titlestring}
+%\lhead[\thepage]{\chaptermark}
+%\rhead[\thesection]{\thepage}
+%\chead{} % leave empty
+%\rhead[\thesubsection]{\thepage}
+%\chead{} % leave empty
+%\rhead[\small CCC]{\sc{\small \thepage}}
+%\lhead[square bracket]{squiggly backet}
+%\rhead[]{\titlestring}
+%\chead{} % leave empty
+%\lfoot[\small \thepage]{\yyyymmdddate\today}
+%\rfoot[\yyyymmdddate\today]{\thepage}
+%\cfoot{} % leave empty
+%\cfoot{ \sc{\small c.b.~hovey} \hfill \footnotesize \today}
+
+%\setlength{\footrulewidth}{0.4pt}
+
 \fancyhead{} % clear all header fields
-\fancyhead[LE,RO]{\thepage}
+\fancyhead[L,RO]{\thepage}
 \fancyhead[LO]{\rightmark}
-\fancyhead[RE]{\leftmark}
+\fancyhead[R]{\leftmark}
 \fancyfoot{} % clear all footer fields
-\fancyfoot[LE,RO]{\scriptsize \datestring}
-\fancyfoot[LO,RE]{\scriptsize \titlestring \; \copyright \; \authorstring }
+% \fancyfoot[L,RO]{\scriptsize \yyyymmdddate\today}
+\fancyfoot[L,RO]{\scriptsize \datestring}
+\fancyfoot[LO,R]{\scriptsize \titlestring \; \copyright \; \authorstring }
 \pagestyle{fancy}
+
+% \newcommand{\abs}[1]{\left| \, #1 \, \right|}
+
 % ==========================================
 
 % -----------------
@@ -67,12 +218,23 @@ snippet hovey "chovey's LaTeX template"
 % -----------------
 \begin{document}
 \title{\titlestring}
-\author{\authorstring\footnote{Corresponding author: ${4:patel.anirudh0025@gmail.com}}
-\\ 
-[2ex] 
-\datestring}
+% \author{\authorstring\footnote{Corresponding author: ${4:E-mail}}}
+\author{$2\footnote{Author e-mail: $4}}
+\date{\datestring}
 \maketitle
+%
+% \include{front}
+% \include{preface}
+%
+% \newpage
+% \setcounter{page}{1}
+% \pagenumbering{arabic}
 
+%\abstract{
+%To come.
+%}
+
+%\newpage
 {\tableofcontents}
 
 \end{document}

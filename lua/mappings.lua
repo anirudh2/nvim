@@ -33,7 +33,12 @@ local mappings = {
   ["i<leader>nt"] = { "<Esc>:NERDTreeToggle<CR>a" };  -- Leader nt -> Toggle NERDTree
 
   -- Remove whitespace
-  ["n<leader>w"] = { ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>" }
+  ["n<leader>w"] = { ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>" };
+
+  -- Vimtex
+  ["n<leader>toc"] = { ":VimtexTocToggle<CR>" };
+  ["n<leader>ll"] = { ":VimtexCompile<CR>" };
+  ["n<leader>lv"] = { ":VimtexView<CR>" };
 }
 
 nvim_mappings(mappings, { silent = true; })
