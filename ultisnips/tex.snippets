@@ -239,3 +239,50 @@ snippet hovey "chovey's LaTeX template"
 
 \end{document}
 endsnippet
+
+snippet item "Itemize Environment" 
+\begin{itemize}
+	\item $1
+\end{itemize}
+endsnippet
+
+snippet it "Italicised Font" 
+\textit{$1}
+endsnippet
+
+snippet bf "Bold Font" 
+\textbf{$1}
+endsnippet
+
+snippet inpy "Minted inline python" 
+\inpy{$1}
+endsnippet
+
+snippet enum "Enumerate Environment" 
+\begin{enumerate}
+	\item $1
+\end{enumerate}
+endsnippet
+
+snippet py "Minted Code Block" 
+\begin{minted}{python}
+$1
+\end{minted}
+endsnippet
+
+snippet sec "Create a new section" 
+\section{$1}
+endsnippet
+
+snippet repo "Link to repo" 
+\authorcomment{The code for this section can be found on the \href{$1}{repo.}}
+endsnippet
+
+snippet pic "Create figure"
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=$1]{$2}
+	\caption{$3}
+	\label{$4}
+\end{figure}
+endsnippet
